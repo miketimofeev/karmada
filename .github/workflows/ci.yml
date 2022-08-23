@@ -1,4 +1,4 @@
-name: CI Workflow1
+name: CI Workflow
 on:
   # Run this workflow every time a new commit pushed to upstream/fork repository.
   # Run workflow on fork repository will help contributors find and resolve issues before sending a PR.
@@ -7,14 +7,14 @@ on:
 jobs:
   golangci:
     name: lint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: checkout code
         uses: actions/checkout@v2
       - name: install Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.18.5
+          go-version: 1.18.3
       - name: vendor
         run: hack/verify-vendor.sh
       - name: lint
@@ -23,7 +23,7 @@ jobs:
         run: hack/verify-import-aliases.sh
   codegen:
     name: codegen
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       GOPATH: ${{ github.workspace }}
     defaults:
@@ -37,7 +37,7 @@ jobs:
       - name: install Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.18.5
+          go-version: 1.18.3
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
       - name: verify codegen
@@ -53,7 +53,7 @@ jobs:
   build:
     name: compile
     needs: codegen # rely on codegen successful completion
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: checkout code
         uses: actions/checkout@v2
@@ -64,26 +64,26 @@ jobs:
       - name: install Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.18.5
+          go-version: 1.18.3
       - name: compile
         run: make all
   test:
     name: unit test
     needs: build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: checkout code
         uses: actions/checkout@v2
       - name: install Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.18.5
+          go-version: 1.18.3
       - name: make test
         run: make test
   e2e:
     name: e2e test
     needs: build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         k8s: [ v1.21.10, v1.22.7, v1.23.4, v1.24.2 ]
@@ -97,7 +97,7 @@ jobs:
       - name: install Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.18.5
+          go-version: 1.18.3
       - name: setup e2e test environment
         run: |
           export CLUSTER_VERSION=kindest/node:${{ matrix.k8s }}
